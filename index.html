@@ -85,7 +85,8 @@
 const STUDENTS = ["علي","عالية","حبيبة","ياسمين","ميرا","عمر","أنس","حمزة","حذيفة"];
 const KEY = "computer_basics_simple_v1";
 
-let data = JSON.parse(localStorage.getItem(KEY) || '{"ticks":{},"missing":{}}');
+let data = JSON.parse(localStorage.getItem(KEY) || '{"ticks":{},"missing":{},"saved":{}}');
+if (!data.saved) data.saved = {}; // توافق البيانات القديمة
 
 function save() { localStorage.setItem(KEY, JSON.stringify(data)); }
 
@@ -94,7 +95,7 @@ function todayKey() {
   return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
 }
 
-function isSaved() { return data.ticks[todayKey()] !== undefined; }
+function isSaved() { return data.saved[todayKey()] === true; }
 
 function toggle(name, checked) {
   const t = todayKey();
@@ -118,13 +119,14 @@ function saveDay() {
       data.missing[name] = (data.missing[name] || 0) + 1;
     }
   });
+  data.saved[t] = true;
   save();
   render();
 }
 
 function resetAll() {
   if (confirm("هل أنت متأكد من حذف جميع البيانات؟")) {
-    data = { ticks: {}, missing: {} };
+    data = { ticks: {}, missing: {}, saved: {} };
     save();
     render();
   }
